@@ -1,0 +1,102 @@
+openapi: 3.0.0
+info:
+  contact:
+    email: kotero.dev@gmail.com
+  description: Spring Boot REST API for Exchange Rates
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  title: Exchange Rates API
+  version: 1.0.0
+tags:
+- description: Requests for fetching requests from Monobank, NBU, Privatbank
+  name: exchangeRates
+paths:
+  /exchange-rate/between:
+    get:
+      description: By passing in the appropriate dates, you can fetch available exchange
+        rates from database
+      operationId: getExchangeRateBetweenDates
+      parameters:
+      - description: Date from where rates should start
+        in: query
+        name: startDate
+        required: true
+        schema:
+          format: date
+          type: string
+          enum:
+          - a
+          - b
+          - c
+      - description: Date with which should a period of rates should end
+        in: query
+        name: endDate
+        required: true
+        schema:
+          format: date
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/ExchangeRateDTO'
+                type: array
+          description: exchange rates between passed dates
+        '400':
+          description: bad input parameter
+        '500':
+          description: some internal error on the server
+      summary: Returns exchange rates for today
+      tags:
+      - exchangeRates
+  /exchange-rate/today:
+    get:
+      description: You can fetch available exchange rates from database for today
+      operationId: getExchangeRateForToday
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/ExchangeRateDTO'
+                type: array
+          description: exchange rates for today
+        '400':
+          description: bad input parameter
+        '500':
+          description: some inner server error
+      summary: Returns exchange rates for today
+      tags:
+      - exchangeRates
+components:
+  schemas:
+    ExchangeRateDTO:
+      properties:
+        bankName:
+          type: string
+        buyRate:
+          format: double
+          type: number
+        createdDate:
+          format: date
+          type: string
+        currencyCode:
+          type: string
+        id:
+          format: uuid
+          type: string
+        sellRate:
+          format: double
+          type: number
+      required:
+      - id
+      - bankName
+      - currencyCode
+      - buyRate
+      - sellRate
+      - createdDate
+      type: object
